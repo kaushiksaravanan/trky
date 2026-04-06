@@ -5,7 +5,8 @@ import { useTrackingStore } from '../stores/trackingStore';
 import { CATEGORIES, CATEGORY_LABELS } from '../data/sampleData';
 import MediaCard from '../components/tracking/MediaCard';
 import PageTransition, { StaggerContainer, StaggerItem } from '../components/ui/PageTransition';
-import { Search as SearchIcon, Clock, X, TrendingUp, ArrowRight } from 'lucide-react';
+import { Search as SearchIcon, Clock, X, TrendingUp, ArrowRight, Wifi, Star } from 'lucide-react';
+import { searchAll } from '../services/api';
 
 const MAX_RECENT = 8;
 
@@ -25,6 +26,8 @@ export default function SearchPage() {
   const [recentSearches, setRecentSearches] = useState(loadRecentSearches);
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const [showSuggestions, setShowSuggestions] = useState(false);
+  const [externalResults, setExternalResults] = useState([]);
+  const [externalLoading, setExternalLoading] = useState(false);
   const { searchMedia, media } = useTrackingStore();
   const navigate = useNavigate();
   const inputRef = useRef(null);
@@ -88,6 +91,18 @@ export default function SearchPage() {
   useEffect(() => {
     setSelectedIndex(-1);
     setShowSuggestions(query.length >= 1);
+  }, [query]);
+
+  // Search external APIs with debounce
+  useEffect(() => {
+    if (query.length < 3) { setExternalResults([]); return; }
+    setExternalLoading(true);
+    const timer = setTimeout(() => {
+      searchAll(query, 8)
+        .then(r => { setExternalResults(r); setExternalLoading(false); })
+        .catch(() => { setExternalLoading(false); });
+    }, 600);
+    return () => clearTimeout(timer);
   }, [query]);
 
   const trending = media
@@ -225,8 +240,54 @@ export default function SearchPage() {
                   animate={{ opacity: 1, scale: 1 }}
                 >
                   <div className="empty-state-icon">🔍</div>
-                  <div className="empty-state-title">No results for "{query}"</div>
-                  <div className="empty-state-text">Try different keywords or check your spelling</div>
+                  <div className="empty-state-title">No local results for "{query}"</div>
+                  <div className="empty-state-text">Searching online databases...</div>
+                </motion.div>
+              )}
+
+              {/* External API Results */}
+              {query.length >= 3 && (externalLoading || externalResults.length > 0) && (
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  style={{ marginTop: 24 }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+                    <Wifi size={14} style={{ color: 'var(--green-400)' }} />
+                    <span style={{ fontSize: 14, fontWeight: 700 }}>From AniList & Open Library</span>
+                    <span style={{ fontSize: 10, color: 'var(--green-400)', fontWeight: 600 }}>LIVE</span>
+                    {externalLoading && (
+                      <motion.div
+                        animate={{ rotate: 360 }}
+                        transition={{ repeat: Infinity, duration: 1, ease: 'linear' }}
+                        style={{ width: 12, height: 12, border: '2px solid var(--border-light)', borderTopColor: 'var(--accent)', borderRadius: '50%' }}
+                      />
+                    )}
+                  </div>
+                  {externalResults.length > 0 && (
+                    <div className="horizontal-scroll">
+                      {externalResults.map(item => (
+                        <motion.div
+                          key={item.id}
+                          style={{ width: 160, flexShrink: 0, cursor: 'pointer' }}
+                          whileHover={{ y: -4 }}
+                          onClick={() => item.siteUrl && window.open(item.siteUrl, '_blank', 'noopener,noreferrer')}
+                        >
+                          <div style={{ position: 'relative', borderRadius: 'var(--radius-lg)', overflow: 'hidden', aspectRatio: '3/4', background: 'var(--bg-secondary)', marginBottom: 8 }}>
+                            {item.cover && <img src={item.cover} alt={item.title} loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover' }} onError={e => { e.target.style.display = 'none'; }} />}
+                            <div style={{ position: 'absolute', bottom: 6, left: 6, background: 'rgba(0,0,0,0.7)', color: 'white', fontSize: 10, fontWeight: 600, padding: '2px 6px', borderRadius: 'var(--radius-sm)' }}>
+                              {item.source === 'anilist' ? 'AniList' : 'OpenLibrary'}
+                            </div>
+                          </div>
+                          <div style={{ fontSize: 13, fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.title}</div>
+                          <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>{item.subtitle}</div>
+                          <div style={{ fontSize: 12, color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: 4, marginTop: 2 }}>
+                            <Star size={11} fill="currentColor" style={{ color: 'var(--yellow-400)' }} /> {item.rating > 0 ? item.rating.toFixed(1) : 'N/A'}
+                          </div>
+                        </motion.div>
+                      ))}
+                    </div>
+                  )}
                 </motion.div>
               )}
             </motion.div>

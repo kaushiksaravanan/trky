@@ -5,7 +5,9 @@ import { useTrackingStore } from '../stores/trackingStore';
 import { CATEGORIES, CATEGORY_LABELS } from '../data/sampleData';
 import MediaCard from '../components/tracking/MediaCard';
 import PageTransition, { StaggerContainer, StaggerItem } from '../components/ui/PageTransition';
-import { Sparkles, TrendingUp, Clock, ArrowRight, Compass, List, MessageCircle, Zap, Play, Star, BarChart3, FolderOpen } from 'lucide-react';
+import { Sparkles, TrendingUp, Clock, ArrowRight, Compass, List, MessageCircle, Zap, Play, Star, BarChart3, FolderOpen, Tv, BookOpen, Flame } from 'lucide-react';
+import LiveFeedSection from '../components/ui/LiveFeedSection';
+import { fetchTrendingAnime, fetchSeasonalAnime, fetchTrendingBooks } from '../services/api';
 
 function getGreeting() {
   const h = new Date().getHours();
@@ -267,6 +269,23 @@ export default function HomePage() {
             </div>
           </div>
         )}
+
+        {/* Live Feeds from External APIs */}
+        <LiveFeedSection
+          title="Trending Anime"
+          icon={<Tv size={18} style={{ color: '#ec4899' }} />}
+          fetchFn={fetchTrendingAnime}
+        />
+        <LiveFeedSection
+          title="This Season's Anime"
+          icon={<Flame size={18} style={{ color: '#f97316' }} />}
+          fetchFn={fetchSeasonalAnime}
+        />
+        <LiveFeedSection
+          title="Trending Books"
+          icon={<BookOpen size={18} style={{ color: '#8b5cf6' }} />}
+          fetchFn={fetchTrendingBooks}
+        />
 
         {/* Trending by category */}
         {trendingByCategory.map(({ category, label, items }) => (
