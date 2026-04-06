@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <!-- Prevent flash of wrong theme -->
+    <script>
+      (function() {
+        try {
+          var t = localStorage.getItem('trky_theme');
+          if (t === 'dark' || (!t && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.setAttribute('data-theme', 'dark');
+          }
+        } catch(e) {}
+      })();
+    </script>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/favicon.svg" />
+    <link rel="manifest" href="/manifest.json" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#ec4899" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="trky" />
+    <meta name="description" content="Track everything you love - anime, games, music, books, movies, TV shows and more. Rate, review, and chat with fans." />
+    <!-- Open Graph -->
+    <meta property="og:title" content="trky - Track Everything You Love" />
+    <meta property="og:description" content="Multi-fandom tracking app for anime, games, music, books, movies, TV shows and more. Rate, share, and chat with fans." />
+    <meta property="og:image" content="/favicon.svg" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://trky.app" />
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="trky - Track Everything You Love" />
+    <meta name="twitter:description" content="Multi-fandom tracking app for anime, games, music, books, movies, TV shows and more." />
+    <meta name="twitter:image" content="/favicon.svg" />
+    <title>trky - Track Everything You Love</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js').catch(() => {});
+        });
+      }
+    </script>
+  </body>
+</html>

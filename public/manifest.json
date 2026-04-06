@@ -1,0 +1,25 @@
+{
+  "name": "trky - Track Everything You Love",
+  "short_name": "trky",
+  "description": "Multi-fandom tracking app for anime, games, music, books, movies, TV shows and more. Rate, share, and chat with fans.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#fffbfd",
+  "theme_color": "#ec4899",
+  "orientation": "any",
+  "categories": ["entertainment", "social"],
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ]
+}
